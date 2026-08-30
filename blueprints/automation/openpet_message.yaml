@@ -9,7 +9,7 @@ blueprint:
     by the **hermes-openpet-homeassistant** Hermes plugin. See the project README for setup.
   domain: automation
   author: Hermes Community
-  source_url: "https://github.com/open-pets/hermes-openpet-homeassistant"
+  source_url: "https://github.com/ChromiteSoft/hermes-openpet-homeassistant"
 
   input:
     # ── Common ──────────────────────────────────────────────────────────

@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Hermes Plugin](https://img.shields.io/badge/Hermes-Plugin-blue)](https://hermes-agent.nousresearch.com/docs)
 [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Compatible-41BDF5)](https://www.home-assistant.io/)
-[![OpenPets](https://img.shields.io/badge/OpenPets-Desktop-ff6b9d)](https://github.com/open-pets)
+[![OpenPets](https://img.shields.io/badge/OpenPets-Desktop-ff6b9d)](https://github.com/ChromiteSoft/hermes-openpet-homeassistant)
 
 A native **Hermes Agent** plugin that bridges **Home Assistant** events to your **OpenPets Desktop** companion in real time.
 
