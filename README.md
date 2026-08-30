@@ -1,4 +1,4 @@
-# openpet-ha
+# hermes-openpet-homeassistant
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Hermes Plugin](https://img.shields.io/badge/Hermes-Plugin-blue)](https://hermes-agent.nousresearch.com/docs)
@@ -31,9 +31,9 @@ It listens to Home Assistant's WebSocket event stream and sends animation + spee
 ### 1. Copy the plugin into your Hermes plugins directory
 
 ```bash
-mkdir -p ~/.hermes/plugins/openpet-ha
+mkdir -p ~/.hermes/plugins/hermes-openpet-homeassistant
 cp plugin.yaml __init__.py event_map.py ha_ws.py pet_sender.py \
-   ~/.hermes/plugins/openpet-ha/
+   ~/.hermes/plugins/hermes-openpet-homeassistant/
 ```
 
 ### 2. Enable it in `~/.hermes/config.yaml`
@@ -41,7 +41,7 @@ cp plugin.yaml __init__.py event_map.py ha_ws.py pet_sender.py \
 ```yaml
 plugins:
   enabled:
-    - openpet-ha
+    - hermes-openpet-homeassistant
 ```
 
 ### 3. Configure secrets in `~/.hermes/.env`
@@ -110,7 +110,7 @@ The plugin parses the value as **`reaction|speech`** (or just plain text — rea
 ## 📂 Repository structure
 
 ```text
-openpet-ha/
+hermes-openpet-homeassistant/
 ├── README.md
 ├── LICENSE
 ├── .gitignore

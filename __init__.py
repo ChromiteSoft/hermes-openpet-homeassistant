@@ -1,7 +1,7 @@
-"""openpet-ha — Animate OpenPets pet from Home Assistant state changes via WebSocket.
+"""hermes-openpet-homeassistant — Animate OpenPets pet from Home Assistant state changes via WebSocket.
 
-Plugin loads from ~/.hermes/plugins/openpet-ha/ and is enabled via
-``plugins.enabled: [openpet-ha]`` in ~/.hermes/config.yaml.
+Plugin loads from ~/.hermes/plugins/hermes-openpet-homeassistant/ and is enabled via
+``plugins.enabled: [hermes-openpet-homeassistant]`` in ~/.hermes/config.yaml.
 
 Pipeline (NO LLM, all deterministic):
 
@@ -29,7 +29,7 @@ Reads its config from two places:
     HASS_TOKEN              (required for live subscription)
 
 - Behaviour settings (user-tunable, auto-populated on first run):
-    ~/.hermes/config.yaml → plugins.entries.openpet-ha.settings.*
+    ~/.hermes/config.yaml → plugins.entries.hermes-openpet-homeassistant.settings.*
         debounce_seconds       (default: 2.0)
         include_entities       (default: [] — empty = subscribe to ALL)
         say_enabled            (default: True)
@@ -51,7 +51,7 @@ import threading
 from pathlib import Path
 from typing import Any, Optional
 
-_log = logging.getLogger("openpet-ha")
+_log = logging.getLogger("hermes-openpet-homeassistant")
 
 
 # ── Defaults (written to config on first run; user-editable thereafter) ──
@@ -90,7 +90,7 @@ def _load_env_file(path: Path) -> dict:
                     value = value[1:-1]
                 out[key] = value
     except Exception as e:
-        _log.warning("openpet-ha: failed to read %s: %s", path, e)
+        _log.warning("hermes-openpet-homeassistant: failed to read %s: %s", path, e)
     return out
 
 
@@ -166,13 +166,13 @@ def _on_ha_event(entity_id: str, new_state: str, old_state: str) -> None:
     reaction, speech = result
 
     if not debouncer.allow(entity_id, new_state):
-        _log.debug("openpet-ha: debounced %s→%s", entity_id, new_state)
+        _log.debug("hermes-openpet-homeassistant: debounced %s→%s", entity_id, new_state)
         return
 
     if not cfg.get("say_enabled", True):
         speech = None  # user disabled speech bubbles
     sender.send(reaction, speech)
-    _log.info("openpet-ha: %s %s→%s → %s%s",
+    _log.info("hermes-openpet-homeassistant: %s %s→%s → %s%s",
               entity_id, old_state, new_state, reaction,
               f' "{speech}"' if speech else "")
 
@@ -186,12 +186,12 @@ def register(ctx) -> None:
         if existing is None:
             try:
                 ctx.set_config(key, value)
-                _log.info("openpet-ha: wrote default %s to config.yaml", key)
+                _log.info("hermes-openpet-homeassistant: wrote default %s to config.yaml", key)
             except PermissionError as e:
-                _log.debug("openpet-ha: managed install, using in-memory default for %s: %s",
+                _log.debug("hermes-openpet-homeassistant: managed install, using in-memory default for %s: %s",
                            key, e)
             except Exception as e:
-                _log.warning("openpet-ha: could not write default %s: %s", key, e)
+                _log.warning("hermes-openpet-homeassistant: could not write default %s: %s", key, e)
 
     # 2) Read behaviour config
     cfg = {}
@@ -205,10 +205,10 @@ def register(ctx) -> None:
     conn = _resolve_config()
 
     if not conn["token"]:
-        _log.info("openpet-ha: OPENPET_HA_TOKEN not set — plugin loaded as no-op. "
+        _log.info("hermes-openpet-homeassistant: OPENPET_HA_TOKEN not set — plugin loaded as no-op. "
                   "Add it to ~/.hermes/.env and restart the gateway to enable reactions.")
     if not conn["hass_token"] or not conn["hass_url"]:
-        _log.info("openpet-ha: HASS_URL/HASS_TOKEN not set — WebSocket listener disabled. "
+        _log.info("hermes-openpet-homeassistant: HASS_URL/HASS_TOKEN not set — WebSocket listener disabled. "
                   "Add them to ~/.hermes/.env and restart the gateway to subscribe.")
         return
 
@@ -243,7 +243,7 @@ def register(ctx) -> None:
         # tolerate single string in config
         entity_filter = [entity_filter]
     if entity_filter is not None and not isinstance(entity_filter, list):
-        _log.warning("openpet-ha: include_entities must be a list, got %s — ignoring",
+        _log.warning("hermes-openpet-homeassistant: include_entities must be a list, got %s — ignoring",
                      type(entity_filter).__name__)
         entity_filter = None
 
@@ -259,7 +259,7 @@ def register(ctx) -> None:
         _state["debouncer"] = debouncer
         _state["ws"] = ws
 
-    _log.info("openpet-ha: enabled → %s:%d (clientId=%s, say=%s, filter=%s)",
+    _log.info("hermes-openpet-homeassistant: enabled → %s:%d (clientId=%s, say=%s, filter=%s)",
               conn["host"], conn["port"], conn["client_id"],
               "on" if cfg.get("say_enabled", True) else "off",
               entity_filter or "ALL")
@@ -282,4 +282,4 @@ def unregister(ctx) -> None:  # pragma: no cover  (optional, called on disable)
         try:
             ws.stop()
         except Exception as e:
-            _log.debug("openpet-ha: ws.stop error: %s", e)
+            _log.debug("hermes-openpet-homeassistant: ws.stop error: %s", e)

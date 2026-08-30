@@ -1,5 +1,5 @@
 """
-ha_ws.py — Home Assistant WebSocket listener for openpet-ha plugin.
+ha_ws.py — Home Assistant WebSocket listener for hermes-openpet-homeassistant plugin.
 
 NO LLM. Pure deterministic event subscription. Runs in a daemon thread
 inside the gateway.
@@ -46,7 +46,7 @@ import time
 import urllib.parse
 from typing import Callable, Optional
 
-_log = logging.getLogger("openpet-ha")
+_log = logging.getLogger("hermes-openpet-homeassistant")
 
 # Type alias for the event callback: (entity_id, new_state, old_state) → None
 EventCallback = Callable[[str, str, Optional[str]], None]
@@ -152,7 +152,7 @@ class HAWebSocket:
         try:
             from websockets.sync.client import connect
         except ImportError as e:
-            _log.error("openpet-ha: websockets not installed: %s", e)
+            _log.error("hermes-openpet-homeassistant: websockets not installed: %s", e)
             return
 
         backoff = self.BACKOFF_MIN
@@ -161,14 +161,14 @@ class HAWebSocket:
                 self._run_once(connect)
                 backoff = self.BACKOFF_MIN
             except HAWebSocketError as e:
-                _log.warning("openpet-ha: ws error: %s (reconnect in %.1fs)",
+                _log.warning("hermes-openpet-homeassistant: ws error: %s (reconnect in %.1fs)",
                              e, backoff)
                 self._connected.clear()
                 if self._stop_evt.wait(backoff):
                     return
                 backoff = min(self.BACKOFF_MAX, backoff * 2 + random.uniform(0, 0.5))
             except Exception as e:
-                _log.warning("openpet-ha: ws unexpected: %s (reconnect in %.1fs)",
+                _log.warning("hermes-openpet-homeassistant: ws unexpected: %s (reconnect in %.1fs)",
                              e, backoff)
                 self._connected.clear()
                 if self._stop_evt.wait(backoff):
@@ -259,7 +259,7 @@ class HAWebSocket:
                     raise HAWebSocketError(f"subscribe failed: {sub_resp!r}")
 
             self._connected.set()
-            _log.info("openpet-ha: subscribed to %s%s",
+            _log.info("hermes-openpet-homeassistant: subscribed to %s%s",
                       self.event_type,
                       f" (filter={self.entity_filter})" if self.entity_filter else "")
 
@@ -329,7 +329,7 @@ class HAWebSocket:
                 except queue.Full:
                     pass
         except Exception as e:
-            _log.warning("openpet-ha: dispatch error: %s", e)
+            _log.warning("hermes-openpet-homeassistant: dispatch error: %s", e)
 
     def _consume_forever(self) -> None:
         """Drain event queue and call user callback. Survives callback errors."""
@@ -341,4 +341,4 @@ class HAWebSocket:
             try:
                 self.on_event(entity_id, new_state, old_state)
             except Exception as e:
-                _log.warning("openpet-ha: on_event callback raised: %s", e)
+                _log.warning("hermes-openpet-homeassistant: on_event callback raised: %s", e)

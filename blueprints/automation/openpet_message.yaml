@@ -6,10 +6,10 @@ blueprint:
       • **State change** (e.g. on/off, open/closed, home/not_home)
       • **Numeric threshold** (e.g. battery < 20, CO2 > 1000, temp > 25)
     The pet reacts via the `input_text.openpet_message` helper which is read
-    by the **openpet-ha** Hermes plugin. See the project README for setup.
+    by the **hermes-openpet-homeassistant** Hermes plugin. See the project README for setup.
   domain: automation
   author: Hermes Community
-  source_url: "https://github.com/open-pets/openpet-ha"
+  source_url: "https://github.com/open-pets/hermes-openpet-homeassistant"
 
   input:
     # ── Common ──────────────────────────────────────────────────────────

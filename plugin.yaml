@@ -1,4 +1,4 @@
-name: openpet-ha
+name: hermes-openpet-homeassistant
 version: "0.1.0"
 description: Animate OpenPets pet from Home Assistant state changes via WebSocket.
 author: Hermes
@@ -14,7 +14,7 @@ license: MIT
 #   HASS_TOKEN             (required for live subscription)
 #
 # Behaviour settings (auto-populated in config.yaml on first run,
-# then user-editable under plugins.entries.openpet-ha.settings.*):
+# then user-editable under plugins.entries.hermes-openpet-homeassistant.settings.*):
 #   enabled          (bool, default true)  — master switch
 #   debounce_seconds (float, default 2.0)  — skip same (entity, to_state) within window
 #   include_entities (list, default [])     — [] = all; else filter list

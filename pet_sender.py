@@ -34,7 +34,7 @@ from typing import Optional
 
 try:
     import logging
-    _log = logging.getLogger("openpet-ha")
+    _log = logging.getLogger("hermes-openpet-homeassistant")
 except Exception:  # pragma: no cover
     _log = None
 
@@ -114,10 +114,10 @@ class PetSender:
                         pass
                 return True
             except (socket.error, OSError) as e:
-                _log_debug(f"openpet-ha: {method} socket error: {e}")
+                _log_debug(f"hermes-openpet-homeassistant: {method} socket error: {e}")
                 return False
             except Exception as e:
-                _log_warning(f"openpet-ha: {method} unexpected: {e}")
+                _log_warning(f"hermes-openpet-homeassistant: {method} unexpected: {e}")
                 return False
 
     # ── High-level helpers ─────────────────────────────────────────────
