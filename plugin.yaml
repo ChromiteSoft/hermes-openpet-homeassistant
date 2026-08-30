@@ -1,0 +1,21 @@
+name: openpet-ha
+version: "0.1.0"
+description: Animate OpenPets pet from Home Assistant state changes via WebSocket.
+author: Hermes
+license: MIT
+
+# Reads config from ~/.hermes/.env:
+#   OPENPET_HA_HOST        (default: YOUR_PET_HOST)
+#   OPENPET_HA_PORT        (default: 18420)
+#   OPENPET_HA_CLIENT_ID   (default: hermes-ha)
+#   OPENPET_HA_TOKEN       (required; silent no-op if unset)
+#   OPENPET_HA_TIMEOUT     (default: 3.0 seconds)
+#   HASS_URL               (e.g. http://YOUR_HA_HOST:8123)
+#   HASS_TOKEN             (required for live subscription)
+#
+# Behaviour settings (auto-populated in config.yaml on first run,
+# then user-editable under plugins.entries.openpet-ha.settings.*):
+#   enabled          (bool, default true)  — master switch
+#   debounce_seconds (float, default 2.0)  — skip same (entity, to_state) within window
+#   include_entities (list, default [])     — [] = all; else filter list
+#   say_enabled      (bool, default true)  — send speech bubbles

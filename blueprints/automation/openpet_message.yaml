@@ -1,0 +1,167 @@
+blueprint:
+  name: "OpenPets — Pet Reaction"
+  description: >
+    Send an animation + speech bubble to your OpenPets desktop pet from any
+    Home Assistant event. Choose between:
+      • **State change** (e.g. on/off, open/closed, home/not_home)
+      • **Numeric threshold** (e.g. battery < 20, CO2 > 1000, temp > 25)
+    The pet reacts via the `input_text.openpet_message` helper which is read
+    by the **openpet-ha** Hermes plugin. See the project README for setup.
+  domain: automation
+  author: Hermes Community
+  source_url: "https://github.com/open-pets/openpet-ha"
+
+  input:
+    # ── Common ──────────────────────────────────────────────────────────
+    entity:
+      name: Device or sensor
+      description: Any Home Assistant entity (light, sensor, binary_sensor, …).
+      selector:
+        entity: {}
+
+    mode:
+      name: When should the pet react?
+      default: state
+      selector:
+        select:
+          options:
+            - label: "When the state changes to a value (e.g. on, off, home)"
+              value: "state"
+            - label: "When a numeric value crosses a threshold (e.g. > 1000)"
+              value: "numeric"
+          mode: dropdown
+
+    # ── State mode inputs ────────────────────────────────────────────────
+    state_match:
+      name: "State value to match (state mode only)"
+      description: "The exact to_state value that triggers the reaction (e.g. on, off, home, open)."
+      default: "on"
+      selector:
+        text: {}
+
+    # ── Numeric mode inputs ──────────────────────────────────────────────
+    numeric_direction:
+      name: "Threshold direction (numeric mode only)"
+      description: "Fire when the value goes above OR below the threshold."
+      default: above
+      selector:
+        select:
+          options:
+            - label: "Above the threshold (e.g. CO2 > 1000)"
+              value: "above"
+            - label: "Below the threshold (e.g. battery < 20)"
+              value: "below"
+          mode: dropdown
+    numeric_threshold:
+      name: "Threshold value (numeric mode only)"
+      description: "The number that triggers the reaction (e.g. 1000, 20, 25)."
+      default: 100
+      selector:
+        number:
+          mode: box
+          min: -1000000
+          max: 1000000
+          step: 1
+
+    # ── Reaction ─────────────────────────────────────────────────────────
+    reaction:
+      name: Animation
+      description: What the pet does on screen.
+      default: celebrating
+      selector:
+        select:
+          options:
+            - label: "🪑 idle — sit calmly"
+              value: "idle"
+            - label: "🤔 thinking — pondering"
+              value: "thinking"
+            - label: "🔨 working — busy"
+              value: "working"
+            - label: "✏️ editing — making changes"
+              value: "editing"
+            - label: "🏃 running — moving fast"
+              value: "running"
+            - label: "🧪 testing — checking things"
+              value: "testing"
+            - label: "⏳ waiting — looking around"
+              value: "waiting"
+            - label: "👋 waving — greeting"
+              value: "waving"
+            - label: "✅ success — happy!"
+              value: "success"
+            - label: "❌ error — alarmed"
+              value: "error"
+            - label: "🎉 celebrating — party time!"
+              value: "celebrating"
+          mode: dropdown
+
+    speech:
+      name: Speech bubble (optional)
+      description: "What the pet says. Leave empty for animation only. Supports emojis 🚪🔥 etc."
+      default: ""
+      selector:
+        text:
+          multiline: false
+
+# ── Triggers ────────────────────────────────────────────────────────────
+# Both state and numeric triggers are defined. Whichever matches will fire.
+# In "state" mode the numeric trigger will never match (val_b is text).
+# In "numeric" mode the state trigger fires too — but the action below
+# routes to the correct branch via trigger.platform check.
+mode: single
+max_exceeded: silent
+trigger:
+  - platform: state
+    entity_id: !input entity
+  - platform: numeric_state
+    entity_id: !input entity
+    above: !input numeric_threshold
+  - platform: numeric_state
+    entity_id: !input entity
+    below: !input numeric_threshold
+
+# ── Action ──────────────────────────────────────────────────────────────
+# In HA blueprints, `!input foo` is substituted by the blueprint loader BEFORE
+# Jinja2 processes the template. So inside value_template we can reference
+# inputs as plain Jinja2 variables: `mode`, `state_match`, etc.
+action:
+  # Numeric mode branch: fire only on numeric_state triggers, check direction.
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: >-
+              {{ trigger.platform == 'numeric_state'
+                 and numeric_direction == 'above'
+                 and trigger.to_state.state | float(0) >= (numeric_threshold | float(0)) }}
+        sequence:
+          - service: input_text.set_value
+            target:
+              entity_id: input_text.openpet_message
+            data:
+              value: "{{ reaction }}|{{ speech }}"
+
+      - conditions:
+          - condition: template
+            value_template: >-
+              {{ trigger.platform == 'numeric_state'
+                 and numeric_direction == 'below'
+                 and trigger.to_state.state | float(0) <= (numeric_threshold | float(0)) }}
+        sequence:
+          - service: input_text.set_value
+            target:
+              entity_id: input_text.openpet_message
+            data:
+              value: "{{ reaction }}|{{ speech }}"
+
+      # State mode branch: fire only on state triggers, match exact value.
+      - conditions:
+          - condition: template
+            value_template: >-
+              {{ trigger.platform == 'state'
+                 and trigger.to_state.state == state_match }}
+        sequence:
+          - service: input_text.set_value
+            target:
+              entity_id: input_text.openpet_message
+            data:
+              value: "{{ reaction }}|{{ speech }}"
