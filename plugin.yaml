@@ -1,21 +1,36 @@
 name: hermes-openpet-homeassistant
-version: "0.1.0"
-description: Animate OpenPets pet from Home Assistant state changes via WebSocket.
-author: Hermes
+version: "0.2.0"
+description: "Animate OpenPets desktop pet from Home Assistant state changes via WebSocket. Real-time, zero LLM, fully deterministic."
+author: "ChromiteSoft"
 license: MIT
+homepage: "https://github.com/ChromiteSoft/hermes-openpet-homeassistant"
+repository: "https://github.com/ChromiteSoft/hermes-openpet-homeassistant"
 
-# Reads config from ~/.hermes/.env:
-#   OPENPET_HA_HOST        (default: YOUR_PET_HOST)
-#   OPENPET_HA_PORT        (default: 18420)
-#   OPENPET_HA_CLIENT_ID   (default: hermes-ha)
-#   OPENPET_HA_TOKEN       (required; silent no-op if unset)
-#   OPENPET_HA_TIMEOUT     (default: 3.0 seconds)
-#   HASS_URL               (e.g. http://YOUR_HA_HOST:8123)
-#   HASS_TOKEN             (required for live subscription)
-#
-# Behaviour settings (auto-populated in config.yaml on first run,
-# then user-editable under plugins.entries.hermes-openpet-homeassistant.settings.*):
+# Declare which lifecycle hooks this plugin registers.
+# This plugin runs an internal background thread that subscribes to HA's
+# WebSocket event stream — it does not register any Hermes lifecycle hooks.
+hooks: []
+
+# Platform support — pure Python + websockets, runs anywhere Python runs
+platforms:
+  - linux
+  - macos
+  - windows
+
+# Optional runtime dependencies
+python_dependencies:
+  - websockets>=13.0
+
+# Variables the user MUST set before enabling.
+# The plugin still loads without them (becomes a no-op), but the user is
+# prompted at install time.
+requires_env:
+  - HASS_TOKEN
+  - OPENPET_HA_TOKEN
+
+# Behaviour settings auto-populated in config.yaml on first run,
+# then user-editable under plugins.entries.hermes-openpet-homeassistant.settings.*:
 #   enabled          (bool, default true)  — master switch
 #   debounce_seconds (float, default 2.0)  — skip same (entity, to_state) within window
-#   include_entities (list, default [])     — [] = all; else filter list
+#   include_entities (list, default [])    — empty = all; otherwise filter list
 #   say_enabled      (bool, default true)  — send speech bubbles
